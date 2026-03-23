@@ -1,0 +1,2055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>JEECUP Daily Tracker — Yash</title>
+<style>
+/* ====== RESET & VARIABLES ====== */
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #0b0d11;
+  --card: #14171f;
+  --card2: #1c1f2b;
+  --border: #252836;
+  --text: #eaeaf0;
+  --text2: #8b8fa3;
+  --accent: #6366f1;
+  --accent2: #818cf8;
+  --green: #22c55e;
+  --green2: #16a34a;
+  --red: #ef4444;
+  --amber: #f59e0b;
+  --orange: #f97316;
+  --sky: #38bdf8;
+  --violet: #a78bfa;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button { cursor: pointer; border: none; font-family: inherit; }
+input, textarea { font-family: inherit; }
+
+/* ====== LOGIN SCREEN ====== */
+.login-screen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px;
+  background: var(--bg);
+}
+
+.login-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 44px 28px;
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+}
+
+.login-emoji { font-size: 52px; margin-bottom: 16px; }
+
+.login-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+.login-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 4px;
+  margin-bottom: 32px;
+}
+
+.login-input {
+  width: 100%;
+  padding: 14px 18px;
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  outline: none;
+  margin-bottom: 14px;
+  text-align: center;
+  letter-spacing: 1px;
+  transition: border-color 0.2s;
+}
+
+.login-input:focus { border-color: var(--accent); }
+
+.login-btn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 700;
+  transition: 0.2s;
+}
+
+.login-btn:active { transform: scale(0.97); }
+
+.login-error {
+  color: var(--red);
+  font-size: 13px;
+  margin-top: 12px;
+  display: none;
+}
+
+.login-quote {
+  margin-top: 28px;
+  color: var(--text2);
+  font-size: 12px;
+  font-style: italic;
+  line-height: 1.6;
+  padding: 0 8px;
+}
+
+.login-exam-info {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  font-size: 12px;
+  color: var(--accent2);
+  font-weight: 600;
+}
+
+/* ====== MAIN APP LAYOUT ====== */
+.app {
+  display: none;
+  padding-bottom: 76px;
+}
+
+.page {
+  display: none;
+  padding: 20px 16px 28px;
+  max-width: 500px;
+  margin: 0 auto;
+  animation: fadeIn 0.25s ease;
+}
+
+.page.active { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ====== BOTTOM NAVIGATION ====== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px 8px;
+  color: var(--text2);
+  font-size: 10px;
+  font-weight: 500;
+  gap: 3px;
+  transition: 0.2s;
+  text-decoration: none;
+  position: relative;
+}
+
+.nav-item.active { color: var(--accent2); }
+
+.nav-icon { font-size: 20px; }
+
+.nav-item.active::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 24px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+/* ====== PAGE HEADER ====== */
+.page-header { margin-bottom: 20px; }
+.page-header h1 { font-size: 22px; font-weight: 800; letter-spacing: -0.3px; }
+.page-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+/* ====== CARDS ====== */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px;
+  margin-bottom: 14px;
+}
+
+.card-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ====== STATS ROW ====== */
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 10px;
+  text-align: center;
+}
+
+.stat-value { font-size: 22px; font-weight: 800; }
+.stat-label { font-size: 10px; color: var(--text2); margin-top: 4px; letter-spacing: 0.3px; }
+
+/* ====== PROGRESS BAR ====== */
+.progress-bar {
+  background: var(--bg);
+  border-radius: 10px;
+  height: 10px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 10px;
+  transition: width 0.5s ease;
+}
+
+/* ====== DATE NAVIGATION ====== */
+.date-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+.date-nav button {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.15s;
+}
+
+.date-nav button:active { transform: scale(0.92); }
+
+.date-nav .date-display { text-align: center; flex: 1; }
+.date-nav .date-display .day { font-size: 15px; font-weight: 700; }
+.date-nav .date-display .sub { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+.today-btn {
+  background: var(--accent) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  width: auto !important;
+  padding: 0 14px !important;
+  display: none !important;
+}
+
+.today-btn.show { display: flex !important; }
+
+/* ====== SECTION HEADERS ====== */
+.section-header {
+  padding: 10px 14px;
+  border-radius: 12px;
+  margin: 16px 0 10px;
+  font-size: 12px;
+  font-weight: 800;
+  text-align: center;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.section-header:first-child { margin-top: 0; }
+
+/* ====== TIME SLOTS ====== */
+.slot {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 8px;
+  transition: 0.2s;
+}
+
+.slot.done {
+  border-color: var(--green2);
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.slot-check {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  background: none;
+  color: transparent;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+  transition: 0.2s;
+  cursor: pointer;
+}
+
+.slot-check:active { transform: scale(0.85); }
+
+.slot.done .slot-check {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.slot-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.slot-task {
+  font-size: 15px;
+  font-weight: 600;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.45;
+}
+
+.slot.done .slot-task {
+  color: var(--green);
+}
+
+.slot-time {
+  font-size: 12px;
+  color: var(--text2);
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slot-now-badge {
+  display: inline-block;
+  background: rgba(99, 102, 241, 0.2);
+  color: var(--accent2);
+  font-weight: 700;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.5px;
+}
+
+.slot-alarm {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text2);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+  margin-top: 0;
+}
+
+.slot-alarm:active { transform: scale(0.88); }
+
+.slot-alarm.on {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: var(--amber);
+}
+
+.slot.now {
+  border-color: var(--accent);
+  background: rgba(99, 102, 241, 0.06);
+}
+
+.slot.is-break { opacity: 0.55; }
+
+/* ====== ALARM CONTROLS ====== */
+.alarm-controls {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.alarm-controls button {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  transition: 0.15s;
+}
+
+.alarm-controls button:active { transform: scale(0.96); }
+
+.alarm-controls button:first-child {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.3);
+  color: var(--amber);
+}
+
+/* ====== CHECKLIST ====== */
+.check-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--card2);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  margin-bottom: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.check-item:active { transform: scale(0.98); }
+
+.check-item.done {
+  border-color: var(--green2);
+  background: rgba(34, 197, 94, 0.06);
+}
+
+.check-box {
+  width: 26px;
+  height: 26px;
+  min-width: 26px;
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: transparent;
+  transition: 0.2s;
+}
+
+.check-item.done .check-box {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+
+.check-label {
+  font-size: 14px;
+  line-height: 1.45;
+  flex: 1;
+}
+
+.check-item.done .check-label {
+  color: var(--green);
+}
+
+/* ====== NOTES ====== */
+.notes-area {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 14px;
+  resize: vertical;
+  min-height: 100px;
+  outline: none;
+  line-height: 1.6;
+}
+
+.notes-area:focus { border-color: var(--accent); }
+
+/* ====== TOAST ====== */
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-120px);
+  background: var(--card);
+  border: 1px solid var(--green);
+  color: var(--text);
+  padding: 14px 24px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  z-index: 300;
+  transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  opacity: 0;
+  white-space: nowrap;
+  max-width: 92vw;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ====== CALENDAR ====== */
+.cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.cal-nav button {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  font-size: 18px;
+  transition: 0.15s;
+}
+
+.cal-nav button:active { transform: scale(0.92); }
+
+.cal-nav .cal-month { font-size: 17px; font-weight: 800; letter-spacing: -0.3px; }
+
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+  margin-bottom: 18px;
+}
+
+.cal-day-name {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text2);
+  padding: 6px;
+  font-weight: 700;
+}
+
+.cal-day {
+  aspect-ratio: 1;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+  border: 1.5px solid transparent;
+  position: relative;
+  gap: 2px;
+}
+
+.cal-day:active { transform: scale(0.9); }
+.cal-day.empty { cursor: default; }
+.cal-day.today { border-color: var(--accent); }
+.cal-day.selected { border-color: var(--text) !important; box-shadow: 0 0 0 1px var(--text); }
+.cal-day.level-0 { background: var(--card2); color: var(--text2); }
+.cal-day.level-1 { background: rgba(239, 68, 68, 0.18); color: var(--red); }
+.cal-day.level-2 { background: rgba(245, 158, 11, 0.18); color: var(--amber); }
+.cal-day.level-3 { background: rgba(34, 197, 94, 0.18); color: var(--green); }
+.cal-day.level-4 { background: rgba(34, 197, 94, 0.35); color: var(--green); }
+.cal-day.future { background: var(--card); color: var(--text2); opacity: 0.35; cursor: default; }
+
+.cal-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.cal-detail { animation: fadeIn 0.25s ease; }
+
+.cal-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.cal-detail-close {
+  background: var(--card2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.cal-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.cal-bar-label {
+  width: 80px;
+  color: var(--text2);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.cal-bar-track {
+  flex: 1;
+  height: 7px;
+  background: var(--bg);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.cal-bar-fill {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.4s ease;
+}
+
+.cal-bar-val {
+  width: 38px;
+  text-align: right;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* ====== RULES ====== */
+.rule {
+  display: flex;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.rule:last-child { border-bottom: none; }
+
+.rule-num {
+  min-width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+/* ====== NEXT UP CARD ====== */
+.next-up {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.next-up-icon { font-size: 24px; }
+.next-up-info { flex: 1; }
+.next-up-label { font-size: 10px; color: var(--accent2); font-weight: 800; letter-spacing: 1px; }
+.next-up-task { font-size: 15px; font-weight: 700; margin-top: 3px; }
+.next-up-time { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+/* ====== HEATMAP ====== */
+.heatmap {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.heat-cell {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+}
+
+/* ====== NOTIFICATION BANNER ====== */
+.notif-banner {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  color: var(--amber);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+}
+
+.notif-banner span { flex: 1; }
+
+/* ====== TIPS ====== */
+.tip {
+  font-size: 13px;
+  color: var(--text2);
+  padding: 8px 0;
+  line-height: 1.5;
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid rgba(37, 40, 54, 0.5);
+}
+
+.tip:last-child { border-bottom: none; }
+
+/* ====== WAKE/SLEEP BANNER ====== */
+.wake-sleep {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  margin-bottom: 14px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text2);
+}
+
+.wake-sleep span { color: var(--text); }
+
+/* ====== QUICK ACTIONS ====== */
+.quick-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.quick-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  border-radius: 14px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  transition: 0.15s;
+}
+
+.quick-btn:active { transform: scale(0.96); }
+
+.quick-btn-icon { font-size: 18px; }
+
+/* ====== MOTIVATION POPUP ====== */
+.motivation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 250;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s;
+}
+
+.motivation-overlay.show { display: flex; }
+
+.motivation-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  max-width: 340px;
+  width: 100%;
+  animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.motivation-emoji { font-size: 48px; margin-bottom: 12px; }
+.motivation-text { font-size: 18px; font-weight: 700; line-height: 1.5; margin-bottom: 8px; }
+.motivation-sub { font-size: 13px; color: var(--text2); margin-bottom: 20px; }
+.motivation-close {
+  padding: 10px 28px;
+  border-radius: 12px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* ====== MILESTONE COUNTER ====== */
+.milestone-bar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.milestone-bar .count {
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--green);
+  min-width: 40px;
+  text-align: center;
+}
+
+.milestone-bar .info { flex: 1; }
+.milestone-bar .info .label { font-size: 13px; font-weight: 700; }
+.milestone-bar .info .sublabel { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
+/* ====== SCROLLBAR ====== */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+/* ====== CHECKLIST PROGRESS ====== */
+.checklist-progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+
+.checklist-progress .pct {
+  font-size: 24px;
+  font-weight: 800;
+  min-width: 55px;
+}
+
+.checklist-progress .bar-wrap { flex: 1; }
+.checklist-progress .bar-label {
+  font-size: 12px;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST NOTIFICATION -->
+<div class="toast" id="toast"></div>
+
+<!-- MOTIVATION POPUP -->
+<div class="motivation-overlay" id="motivationOverlay" onclick="closeMotivation()">
+  <div class="motivation-card" onclick="event.stopPropagation()">
+    <div class="motivation-emoji" id="motivEmoji">🔥</div>
+    <div class="motivation-text" id="motivText">Great job!</div>
+    <div class="motivation-sub" id="motivSub">Keep going!</div>
+    <button class="motivation-close" onclick="closeMotivation()">Let's Go! 💪</button>
+  </div>
+</div>
+
+<!-- ==================== LOGIN SCREEN ==================== -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-card">
+    <div class="login-emoji">📚</div>
+    <div class="login-title">JEECUP Daily Tracker</div>
+    <div class="login-sub">Stay focused. Stay consistent.</div>
+    <input type="text" class="login-input" id="loginInput" placeholder="Enter your name" autocomplete="off" autofocus>
+    <button class="login-btn" onclick="tryLogin()">Let's Go →</button>
+    <div class="login-error" id="loginError">Type "yash" to continue</div>
+    <div class="login-exam-info" id="loginExamInfo"></div>
+    <div class="login-quote" id="loginQuote"></div>
+  </div>
+</div>
+
+<!-- ==================== MAIN APP ==================== -->
+<div class="app" id="app">
+
+  <!-- ========== HOME PAGE ========== -->
+  <div class="page" id="pageHome">
+    <div class="page-header">
+      <h1 id="greeting">Good Morning, Yash! 👋</h1>
+      <p id="dateDisplay"></p>
+    </div>
+
+    <!-- Next Up Card -->
+    <div class="next-up" id="nextUpBox" style="display:none">
+      <div class="next-up-icon">⏰</div>
+      <div class="next-up-info">
+        <div class="next-up-label">NEXT UP</div>
+        <div class="next-up-task" id="nextUpTask"></div>
+        <div class="next-up-time" id="nextUpTime"></div>
+      </div>
+    </div>
+
+    <!-- Stats Row -->
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="statDays" style="color:var(--accent2)">--</div>
+        <div class="stat-label">Days Left</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statStreak" style="color:var(--amber)">0🔥</div>
+        <div class="stat-label">Streak</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="statBlocks" style="color:var(--green)">0/10</div>
+        <div class="stat-label">Study Blocks</div>
+      </div>
+    </div>
+
+    <!-- Milestone -->
+    <div class="milestone-bar">
+      <div class="count" id="milestoneCount">0</div>
+      <div class="info">
+        <div class="label">Tasks Completed</div>
+        <div class="sublabel" id="milestoneSub">0/20 total tasks done today</div>
+      </div>
+    </div>
+
+    <!-- Study Progress -->
+    <div class="card">
+      <div class="card-title">📊 Study Progress</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span>Today's Study Slots</span>
+        <span id="studyPct" style="font-weight:700">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="studyBar" style="width:0%;background:var(--accent)"></div>
+      </div>
+    </div>
+
+    <!-- Checklist Progress -->
+    <div class="card">
+      <div class="card-title">✅ Checklist Progress</div>
+      <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
+        <span>Daily Checklist</span>
+        <span id="checkPct" style="font-weight:700">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="checkBar" style="width:0%;background:var(--green)"></div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <button class="quick-btn" onclick="showPage('Schedule')">
+        <span class="quick-btn-icon">📋</span> Schedule
+      </button>
+      <button class="quick-btn" onclick="showPage('Checklist')">
+        <span class="quick-btn-icon">✅</span> Checklist
+      </button>
+      <button class="quick-btn" onclick="showPage('Calendar')">
+        <span class="quick-btn-icon">📅</span> Calendar
+      </button>
+      <button class="quick-btn" onclick="showPage('Rules')">
+        <span class="quick-btn-icon">📜</span> Rules
+      </button>
+    </div>
+
+    <!-- Last 30 Days Heatmap -->
+    <div class="card">
+      <div class="card-title">📅 Last 30 Days</div>
+      <div class="heatmap" id="heatmap"></div>
+    </div>
+
+    <!-- Daily Motivation -->
+    <div class="card" style="text-align:center">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600;letter-spacing:0.5px">💡 DAILY MOTIVATION</div>
+      <div style="font-size:14px;font-weight:500;line-height:1.6;color:var(--text)" id="dailyQuote"></div>
+    </div>
+  </div>
+
+  <!-- ========== SCHEDULE PAGE ========== -->
+  <div class="page" id="pageSchedule">
+    <div class="page-header">
+      <h1>📋 Schedule</h1>
+      <p>Check off each slot as you complete it</p>
+    </div>
+
+    <!-- Date Navigation -->
+    <div class="date-nav">
+      <button onclick="changeDate(-1)">‹</button>
+      <div class="date-display">
+        <div class="day" id="schedDateMain"></div>
+        <div class="sub" id="schedDateSub"></div>
+      </div>
+      <button class="today-btn" id="todayBtn" onclick="goToday()">Today</button>
+      <button onclick="changeDate(1)">›</button>
+    </div>
+
+    <!-- Notification Banner -->
+    <div id="notifBanner" class="notif-banner" style="display:none" onclick="requestNotifPermission()">
+      <span>🔔</span>
+      <span>Tap to enable notifications for reminders</span>
+      <span>→</span>
+    </div>
+
+    <!-- Schedule Progress -->
+    <div style="margin-bottom:14px;padding:10px 14px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;font-weight:600" id="schedProgress">0/10 study blocks • 0%</div>
+      <div class="progress-bar" style="height:6px">
+        <div class="progress-fill" id="schedProgressBar" style="width:0%;background:var(--accent)"></div>
+      </div>
+    </div>
+
+    <!-- Wake / Sleep -->
+    <div class="wake-sleep">
+      <div>🌅 Wake: <span>7:30 AM</span></div>
+      <div>🌙 Sleep: <span>11:30 PM</span></div>
+    </div>
+
+    <!-- Alarm Controls -->
+    <div class="alarm-controls">
+      <button onclick="toggleAllAlarms(true)">🔔 All Alarms On</button>
+      <button onclick="toggleAllAlarms(false)">🔕 All Off</button>
+    </div>
+
+    <!-- Schedule Slots -->
+    <div id="scheduleSlots"></div>
+  </div>
+
+  <!-- ========== CHECKLIST PAGE ========== -->
+  <div class="page" id="pageChecklist">
+    <div class="page-header">
+      <h1>✅ Daily Checklist</h1>
+      <p>Track your daily goals</p>
+    </div>
+
+    <!-- Checklist Progress -->
+    <div class="checklist-progress">
+      <div class="pct" id="checklistPct">0%</div>
+      <div class="bar-wrap">
+        <div class="bar-label">Completion — <strong id="checkCount">0/7</strong></div>
+        <div class="progress-bar" style="height:8px">
+          <div class="progress-fill" id="checklistBar" style="width:0%;background:var(--accent)"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Checklist Items -->
+    <div class="card">
+      <div class="card-title">📋 Today's Checklist</div>
+      <div id="checklistItems"></div>
+    </div>
+
+    <!-- Notes -->
+    <div class="card">
+      <div class="card-title">📝 Daily Notes</div>
+      <textarea class="notes-area" id="notesArea" placeholder="How was your day? Any observations..." oninput="saveNotes()"></textarea>
+    </div>
+
+    <!-- Tips -->
+    <div class="card">
+      <div class="card-title">💡 Study Tips</div>
+      <div class="tip">🎯 Start with just 5 minutes if you feel lazy</div>
+      <div class="tip">📵 Keep phone outside room during study</div>
+      <div class="tip">🎮 No BGMI before completing 3 study blocks</div>
+      <div class="tip">📐 Math is compulsory daily</div>
+      <div class="tip">💪 Bad day ≠ skip day. Even 30 min counts.</div>
+    </div>
+  </div>
+
+  <!-- ========== CALENDAR PAGE ========== -->
+  <div class="page" id="pageCalendar">
+    <div class="page-header">
+      <h1>📅 Monthly Calendar</h1>
+      <p>Track your progress over time</p>
+    </div>
+
+    <!-- Month Navigation -->
+    <div class="cal-nav">
+      <button onclick="changeMonth(-1)">‹</button>
+      <div class="cal-month" id="calMonth"></div>
+      <button onclick="changeMonth(1)">›</button>
+    </div>
+
+    <!-- Calendar Grid -->
+    <div class="cal-grid" id="calGrid"></div>
+
+    <!-- Monthly Stats -->
+    <div class="stats-row" id="calStats"></div>
+
+    <!-- Day Detail -->
+    <div id="calDetail"></div>
+  </div>
+
+  <!-- ========== RULES PAGE ========== -->
+  <div class="page" id="pageRules">
+    <div class="page-header">
+      <h1>📜 Rules & Guidelines</h1>
+      <p>Non-negotiable rules for JEECUP prep</p>
+    </div>
+
+    <!-- Rules -->
+    <div class="card">
+      <div class="card-title" style="color:var(--red)">⚠️ Non-Negotiable Rules</div>
+      <div class="rule">
+        <div class="rule-num">1</div>
+        <div>Start with just 5 minutes if you feel lazy. Momentum will carry you forward.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">2</div>
+        <div>Keep phone outside room during study. No exceptions.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">3</div>
+        <div>No BGMI before completing 3 study blocks. Earn your game time.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">4</div>
+        <div>Math is compulsory every single day. No skipping.</div>
+      </div>
+      <div class="rule">
+        <div class="rule-num">5</div>
+        <div>Bad day ≠ skip day. Even 30 minutes counts.</div>
+      </div>
+    </div>
+
+    <!-- Schedule Overview -->
+    <div class="card">
+      <div class="card-title">🕐 Schedule Overview</div>
+      <div style="font-size:13px;line-height:2.2;color:var(--text2)">
+        <div>⏰ <strong style="color:var(--text)">Wake Up:</strong> 7:30 AM</div>
+        <div>🌅 <strong style="color:var(--text)">Morning:</strong> 8:00 – 11:00 (High Focus)</div>
+        <div>☀️ <strong style="color:var(--text)">Midday:</strong> 11:00 – 1:00 (Light Focus)</div>
+        <div>📝 <strong style="color:var(--text)">Afternoon:</strong> 1:00 – 2:00 (Practice)</div>
+        <div>😌 <strong style="color:var(--text)">Free Time:</strong> 2:00 – 4:00</div>
+        <div>🎮 <strong style="color:var(--text)">BGMI:</strong> 4:00 – 9:00 (Controlled)</div>
+        <div>🌙 <strong style="color:var(--text)">Night:</strong> 9:00 – 11:00 (Rank Booster)</div>
+        <div>😴 <strong style="color:var(--text)">Sleep:</strong> 11:30 PM</div>
+      </div>
+    </div>
+
+    <!-- Daily Study Targets -->
+    <div class="card">
+      <div class="card-title">🎯 Daily Study Targets</div>
+      <div style="font-size:13px;line-height:2.2;color:var(--text2)">
+        <div>📐 <strong style="color:var(--text)">Math:</strong> 2 sessions (Blocks 1–2 + Practice)</div>
+        <div>⚡ <strong style="color:var(--text)">Physics:</strong> 1–2 sessions (Blocks 3–4)</div>
+        <div>🧪 <strong style="color:var(--text)">Chemistry:</strong> 1 session (Blocks 5–6)</div>
+        <div>📖 <strong style="color:var(--text)">Revision:</strong> 1 session (Block 9)</div>
+        <div>📝 <strong style="color:var(--text)">Formulas:</strong> 1 session (Block 10)</div>
+        <div>🔢 <strong style="color:var(--text)">Total:</strong> 10 study blocks daily</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== BOTTOM NAVIGATION ========== -->
+  <div class="bottom-nav">
+    <a class="nav-item active" onclick="showPage('Home')" id="navHome">
+      <div class="nav-icon">🏠</div>Home
+    </a>
+    <a class="nav-item" onclick="showPage('Schedule')" id="navSchedule">
+      <div class="nav-icon">📋</div>Schedule
+    </a>
+    <a class="nav-item" onclick="showPage('Checklist')" id="navChecklist">
+      <div class="nav-icon">✅</div>Checklist
+    </a>
+    <a class="nav-item" onclick="showPage('Calendar')" id="navCalendar">
+      <div class="nav-icon">📅</div>Calendar
+    </a>
+    <a class="nav-item" onclick="showPage('Rules')" id="navRules">
+      <div class="nav-icon">📜</div>Rules
+    </a>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// JEECUP DAILY MASTER TIMETABLE TRACKER
+// Pure HTML/CSS/JS — No frameworks
+// ============================================================
+
+// ====== TIMETABLE DATA ======
+var SECTIONS = [
+  {
+    name: 'MORNING (HIGH FOCUS)', color: '#f97316', colorBg: 'rgba(249,115,22,0.12)',
+    slots: [
+      { id: 's1', time: '8:00 – 8:30', task: 'Math (Study Block 1)', startH: 8, startM: 0, study: true },
+      { id: 's2', time: '8:30 – 9:00', task: 'Math (Study Block 2)', startH: 8, startM: 30, study: true },
+      { id: 's3', time: '9:00 – 9:30', task: 'BREAK (No phone)', startH: 9, startM: 0, study: false },
+      { id: 's4', time: '9:30 – 10:00', task: 'Physics (Study Block 3)', startH: 9, startM: 30, study: true },
+      { id: 's5', time: '10:00 – 10:30', task: 'Physics (Study Block 4)', startH: 10, startM: 0, study: true },
+      { id: 's6', time: '10:30 – 11:00', task: 'BREAK', startH: 10, startM: 30, study: false }
+    ]
+  },
+  {
+    name: 'MIDDAY (LIGHT FOCUS)', color: '#38bdf8', colorBg: 'rgba(56,189,248,0.12)',
+    slots: [
+      { id: 's7', time: '11:00 – 11:30', task: 'Chemistry (Study Block 5)', startH: 11, startM: 0, study: true },
+      { id: 's8', time: '11:30 – 12:00', task: 'Chemistry (Study Block 6)', startH: 11, startM: 30, study: true },
+      { id: 's9', time: '12:00 – 1:00', task: 'LUNCH + REST', startH: 12, startM: 0, study: false }
+    ]
+  },
+  {
+    name: 'AFTERNOON (PRACTICE)', color: '#22c55e', colorBg: 'rgba(34,197,94,0.12)',
+    slots: [
+      { id: 's10', time: '1:00 – 1:30', task: 'Math Practice (Study Block 7)', startH: 13, startM: 0, study: true },
+      { id: 's11', time: '1:30 – 2:00', task: 'Mixed Questions (Study Block 8)', startH: 13, startM: 30, study: true },
+      { id: 's12', time: '2:00 – 4:00', task: 'REST / FREE TIME (Control Phone)', startH: 14, startM: 0, study: false }
+    ]
+  },
+  {
+    name: 'BGMI (CONTROLLED)', color: '#ef4444', colorBg: 'rgba(239,68,68,0.12)',
+    slots: [
+      { id: 's13', time: '4:00 – 6:00', task: 'BGMI', startH: 16, startM: 0, study: false },
+      { id: 's14', time: '6:00 – 7:00', task: 'BREAK / Refresh', startH: 18, startM: 0, study: false },
+      { id: 's15', time: '7:00 – 9:00', task: 'BGMI', startH: 19, startM: 0, study: false }
+    ]
+  },
+  {
+    name: 'NIGHT (RANK BOOSTER)', color: '#a78bfa', colorBg: 'rgba(167,139,250,0.12)',
+    slots: [
+      { id: 's16', time: '9:00 – 9:30', task: 'Dinner', startH: 21, startM: 0, study: false },
+      { id: 's17', time: '9:30 – 10:00', task: 'Revision (Study Block 9)', startH: 21, startM: 30, study: true },
+      { id: 's18', time: '10:00 – 10:30', task: 'Formulas + Weak Topics (Study Block 10)', startH: 22, startM: 0, study: true },
+      { id: 's19', time: '10:30 – 11:00', task: 'Relax (No heavy phone use)', startH: 22, startM: 30, study: false },
+      { id: 's20', time: '11:30', task: 'SLEEP', startH: 23, startM: 30, study: false }
+    ]
+  }
+];
+
+var CHECKLIST_ITEMS = [
+  { text: 'Math (2 sessions done)', emoji: '📐' },
+  { text: 'Physics (1–2 sessions done)', emoji: '⚡' },
+  { text: 'Chemistry (1 session done)', emoji: '🧪' },
+  { text: 'Practice questions done', emoji: '📝' },
+  { text: 'Revision done', emoji: '📖' },
+  { text: 'Phone kept away during study', emoji: '📵' },
+  { text: 'BGMI only after 4 PM', emoji: '🎮' }
+];
+
+var ALL_SLOTS = [];
+var STUDY_SLOTS = [];
+for (var i = 0; i < SECTIONS.length; i++) {
+  for (var j = 0; j < SECTIONS[i].slots.length; j++) {
+    ALL_SLOTS.push(SECTIONS[i].slots[j]);
+    if (SECTIONS[i].slots[j].study) STUDY_SLOTS.push(SECTIONS[i].slots[j]);
+  }
+}
+
+var EXAM_DATE = new Date(2025, 4, 31);
+
+var MOTIVATIONS = [
+  { emoji: '🔥', text: 'Killing it, Yash!', sub: 'Keep the fire burning!' },
+  { emoji: '💪', text: 'One step closer to JEECUP!', sub: 'Every block counts.' },
+  { emoji: '🧠', text: 'Your brain is getting stronger!', sub: 'Neural connections growing.' },
+  { emoji: '⚡', text: 'Consistency beats talent!', sub: 'You\'re proving it right now.' },
+  { emoji: '🏆', text: 'Champions don\'t skip!', sub: 'And you didn\'t.' },
+  { emoji: '🎯', text: 'Locked in!', sub: 'Focus mode activated.' },
+  { emoji: '📈', text: 'Progress is progress!', sub: 'No matter how small.' },
+  { emoji: '🌟', text: 'You\'re built different!', sub: 'Most people quit by now.' },
+  { emoji: '💎', text: 'Hard work always pays off!', sub: 'Results are coming.' },
+  { emoji: '🚀', text: 'Unstoppable mode!', sub: 'Nothing can slow you down.' },
+  { emoji: '👑', text: 'Future topper in the making!', sub: 'Remember this moment.' },
+  { emoji: '✨', text: 'Every block counts!', sub: 'Compounding effort.' },
+  { emoji: '🔑', text: 'Discipline = Freedom!', sub: 'You\'re earning your future.' },
+  { emoji: '💯', text: 'That\'s the spirit!', sub: 'Pure dedication.' },
+  { emoji: '🎓', text: 'JEECUP is yours!', sub: 'You\'re claiming it one block at a time.' }
+];
+
+var DAILY_QUOTES = [
+  "The secret of getting ahead is getting started. — Mark Twain",
+  "Success is the sum of small efforts repeated day in and day out.",
+  "Don't watch the clock; do what it does — keep going.",
+  "The pain of discipline is less than the pain of regret.",
+  "You don't have to be great to start, but you have to start to be great.",
+  "Dream big. Start small. Act now.",
+  "Push yourself, because no one else is going to do it for you.",
+  "It's not about being the best. It's about being better than yesterday.",
+  "Believe in yourself and all that you are.",
+  "Success doesn't come from what you do occasionally, it comes from what you do consistently.",
+  "Today's sacrifice is tomorrow's success.",
+  "Wake up with determination. Go to bed with satisfaction.",
+  "Your future self will thank you for the work you put in today.",
+  "Small daily improvements lead to stunning results.",
+  "The harder you work, the luckier you get."
+];
+
+// ====== STATE ======
+var viewDate = new Date();
+var calMonth = new Date().getMonth();
+var calYear = new Date().getFullYear();
+var calSelectedDate = null;
+var motivationTimeout = null;
+var completedTodayCount = 0;
+
+// ====== UTILITY FUNCTIONS ======
+function dateKey(d) {
+  var dd = d || viewDate;
+  return dd.getFullYear() + '-' + String(dd.getMonth() + 1).padStart(2, '0') + '-' + String(dd.getDate()).padStart(2, '0');
+}
+
+function todayKey() { return dateKey(new Date()); }
+
+function getData(key) {
+  var raw = localStorage.getItem('jeecup_' + key);
+  return raw ? JSON.parse(raw) : {};
+}
+
+function setData(key, val) {
+  localStorage.setItem('jeecup_' + key, JSON.stringify(val));
+}
+
+function getDayData(dk) {
+  return getData('day_' + dk) || {};
+}
+
+function setDayData(dk, data) {
+  setData('day_' + dk, data);
+}
+
+function showToast(msg) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timeout);
+  t._timeout = setTimeout(function() { t.classList.remove('show'); }, 2200);
+}
+
+function showMotivation(emoji, text, sub) {
+  var overlay = document.getElementById('motivationOverlay');
+  document.getElementById('motivEmoji').textContent = emoji;
+  document.getElementById('motivText').textContent = text;
+  document.getElementById('motivSub').textContent = sub;
+  overlay.classList.add('show');
+  clearTimeout(motivationTimeout);
+  motivationTimeout = setTimeout(function() { overlay.classList.remove('show'); }, 3000);
+}
+
+function closeMotivation() {
+  document.getElementById('motivationOverlay').classList.remove('show');
+}
+
+function formatDateFull(d) {
+  var days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  return days[d.getDay()] + ', ' + d.getDate() + ' ' + months[d.getMonth()];
+}
+
+function formatDateShort(d) {
+  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return d.getDate() + ' ' + months[d.getMonth()] + ' ' + d.getFullYear();
+}
+
+function isToday(d) { return dateKey(d) === todayKey(); }
+
+function daysUntilExam() {
+  var now = new Date();
+  now.setHours(0, 0, 0, 0);
+  var diff = EXAM_DATE - now;
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
+
+function getGreeting() {
+  var h = new Date().getHours();
+  if (h < 12) return 'Good Morning';
+  if (h < 17) return 'Good Afternoon';
+  if (h < 21) return 'Good Evening';
+  return 'Night Owl Mode';
+}
+
+function getStreak() {
+  var streak = 0;
+  var d = new Date();
+  d.setHours(0, 0, 0, 0);
+  var todayData = getDayData(dateKey(d));
+  var todaySlots = todayData.slots || {};
+  var todayHasProgress = false;
+  for (var k in todaySlots) { if (todaySlots[k]) { todayHasProgress = true; break; } }
+  if (!todayHasProgress) d.setDate(d.getDate() - 1);
+  while (true) {
+    var dk = dateKey(d);
+    var data = getDayData(dk);
+    var slots = data.slots || {};
+    var done = 0;
+    for (var s = 0; s < STUDY_SLOTS.length; s++) { if (slots[STUDY_SLOTS[s].id]) done++; }
+    if (done >= 3) {
+      streak++;
+      d.setDate(d.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+  return streak;
+}
+
+function getStudyProgress(dk) {
+  var data = getDayData(dk);
+  var slots = data.slots || {};
+  var done = 0;
+  for (var s = 0; s < STUDY_SLOTS.length; s++) { if (slots[STUDY_SLOTS[s].id]) done++; }
+  return { done: done, total: STUDY_SLOTS.length, pct: Math.round(done / STUDY_SLOTS.length * 100) };
+}
+
+function getCheckProgress(dk) {
+  var data = getDayData(dk);
+  var checks = data.checks || {};
+  var done = 0;
+  for (var i = 0; i < CHECKLIST_ITEMS.length; i++) { if (checks['c' + i]) done++; }
+  return { done: done, total: CHECKLIST_ITEMS.length, pct: Math.round(done / CHECKLIST_ITEMS.length * 100) };
+}
+
+function getOverallProgress(dk) {
+  var s = getStudyProgress(dk);
+  var c = getCheckProgress(dk);
+  var totalDone = s.done + c.done;
+  var totalAll = s.total + c.total;
+  return totalAll === 0 ? 0 : Math.round(totalDone / totalAll * 100);
+}
+
+function getCurrentSlotId() {
+  var now = new Date();
+  var nowMin = now.getHours() * 60 + now.getMinutes();
+  for (var i = ALL_SLOTS.length - 1; i >= 0; i--) {
+    var s = ALL_SLOTS[i];
+    var slotMin = s.startH * 60 + s.startM;
+    if (nowMin >= slotMin) return s.id;
+  }
+  return null;
+}
+
+function getNextSlot() {
+  var now = new Date();
+  var nowMin = now.getHours() * 60 + now.getMinutes();
+  for (var i = 0; i < ALL_SLOTS.length; i++) {
+    var s = ALL_SLOTS[i];
+    var slotMin = s.startH * 60 + s.startM;
+    if (slotMin > nowMin) return { slot: s, minsLeft: slotMin - nowMin };
+  }
+  return null;
+}
+
+function getAllDoneCount(dk) {
+  var data = getDayData(dk);
+  var slots = data.slots || {};
+  var count = 0;
+  for (var i = 0; i < ALL_SLOTS.length; i++) { if (slots[ALL_SLOTS[i].id]) count++; }
+  return count;
+}
+
+// ====== LOGIN ======
+function initLogin() {
+  var q = DAILY_QUOTES[Math.floor(Math.random() * DAILY_QUOTES.length)];
+  document.getElementById('loginQuote').textContent = '"' + q + '"';
+
+  var daysLeft = daysUntilExam();
+  document.getElementById('loginExamInfo').textContent = '📅 ' + daysLeft + ' days until JEECUP exam';
+
+  document.getElementById('loginInput').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') tryLogin();
+  });
+}
+
+function tryLogin() {
+  var val = document.getElementById('loginInput').value.trim().toLowerCase();
+  if (val === 'yash') {
+    localStorage.setItem('jeecup_logged', 'true');
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  } else {
+    var err = document.getElementById('loginError');
+    err.style.display = 'block';
+    document.getElementById('loginInput').style.borderColor = '#ef4444';
+    setTimeout(function() {
+      err.style.display = 'none';
+      document.getElementById('loginInput').style.borderColor = '';
+    }, 2000);
+  }
+}
+
+// ====== PAGE NAVIGATION ======
+function showPage(name) {
+  var pages = document.querySelectorAll('.page');
+  var navs = document.querySelectorAll('.nav-item');
+  for (var i = 0; i < pages.length; i++) pages[i].classList.remove('active');
+  for (var i = 0; i < navs.length; i++) navs[i].classList.remove('active');
+  document.getElementById('page' + name).classList.add('active');
+  document.getElementById('nav' + name).classList.add('active');
+
+  if (name === 'Home') renderHome();
+  if (name === 'Schedule') renderSchedule();
+  if (name === 'Checklist') renderChecklist();
+  if (name === 'Calendar') renderCalendar();
+}
+
+// ====== HOME PAGE ======
+function renderHome() {
+  var today = new Date();
+  document.getElementById('greeting').textContent = getGreeting() + ', Yash! 👋';
+  document.getElementById('dateDisplay').textContent = formatDateFull(today);
+
+  document.getElementById('statDays').textContent = daysUntilExam();
+  document.getElementById('statStreak').textContent = getStreak() + '🔥';
+
+  var dk = todayKey();
+  var sp = getStudyProgress(dk);
+  document.getElementById('statBlocks').textContent = sp.done + '/' + sp.total;
+  document.getElementById('studyPct').textContent = sp.pct + '%';
+  document.getElementById('studyBar').style.width = sp.pct + '%';
+
+  var cp = getCheckProgress(dk);
+  document.getElementById('checkPct').textContent = cp.pct + '%';
+  document.getElementById('checkBar').style.width = cp.pct + '%';
+
+  var next = getNextSlot();
+  var nextBox = document.getElementById('nextUpBox');
+  if (next && isToday(today)) {
+    nextBox.style.display = 'flex';
+    document.getElementById('nextUpTask').textContent = next.slot.task;
+    var hrs = Math.floor(next.minsLeft / 60);
+    var mins = next.minsLeft % 60;
+    var timeStr = hrs > 0 ? hrs + 'h ' + mins + 'm' : mins + ' min';
+    document.getElementById('nextUpTime').textContent = next.slot.time + ' • in ' + timeStr;
+  } else {
+    nextBox.style.display = 'none';
+  }
+
+  var allDone = getAllDoneCount(dk);
+  document.getElementById('milestoneCount').textContent = allDone;
+  document.getElementById('milestoneSub').textContent = allDone + '/' + ALL_SLOTS.length + ' total tasks done today';
+
+  var dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0)) / (1000 * 60 * 60 * 24));
+  document.getElementById('dailyQuote').textContent = '"' + DAILY_QUOTES[dayOfYear % DAILY_QUOTES.length] + '"';
+
+  renderHeatmap();
+}
+
+function renderHeatmap() {
+  var container = document.getElementById('heatmap');
+  container.innerHTML = '';
+  var today = new Date();
+  for (var i = 29; i >= 0; i--) {
+    var d = new Date(today);
+    d.setDate(d.getDate() - i);
+    var pct = getOverallProgress(dateKey(d));
+    var color = 'var(--card2)';
+    if (pct > 0 && pct < 30) color = 'rgba(239,68,68,0.35)';
+    else if (pct >= 30 && pct < 60) color = 'rgba(245,158,11,0.35)';
+    else if (pct >= 60 && pct < 85) color = 'rgba(34,197,94,0.35)';
+    else if (pct >= 85) color = 'rgba(34,197,94,0.65)';
+    var cell = document.createElement('div');
+    cell.className = 'heat-cell';
+    cell.style.background = color;
+    cell.title = formatDateShort(d) + ': ' + pct + '%';
+    container.appendChild(cell);
+  }
+}
+
+// ====== SCHEDULE PAGE ======
+function renderSchedule() {
+  var dk = dateKey(viewDate);
+  var days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+  document.getElementById('schedDateMain').textContent = days[viewDate.getDay()] + ', ' + viewDate.getDate() + ' ' + months[viewDate.getMonth()];
+  document.getElementById('schedDateSub').textContent = isToday(viewDate) ? 'Today' : formatDateShort(viewDate);
+
+  var todayBtn = document.getElementById('todayBtn');
+  if (isToday(viewDate)) todayBtn.classList.remove('show');
+  else todayBtn.classList.add('show');
+
+  if ('Notification' in window && Notification.permission === 'default') {
+    document.getElementById('notifBanner').style.display = 'flex';
+  } else {
+    document.getElementById('notifBanner').style.display = 'none';
+  }
+
+  var sp = getStudyProgress(dk);
+  document.getElementById('schedProgress').textContent = sp.done + '/' + sp.total + ' study blocks • ' + sp.pct + '%';
+  document.getElementById('schedProgressBar').style.width = sp.pct + '%';
+
+  var data = getDayData(dk);
+  var slots = data.slots || {};
+  var alarms = data.alarms || {};
+  var currentId = isToday(viewDate) ? getCurrentSlotId() : null;
+
+  var container = document.getElementById('scheduleSlots');
+  container.innerHTML = '';
+
+  for (var si = 0; si < SECTIONS.length; si++) {
+    var section = SECTIONS[si];
+    var header = document.createElement('div');
+    header.className = 'section-header';
+    header.style.background = section.colorBg;
+    header.style.color = section.color;
+    header.textContent = section.name;
+    container.appendChild(header);
+
+    for (var sj = 0; sj < section.slots.length; sj++) {
+      var slot = section.slots[sj];
+      var isDone = !!slots[slot.id];
+      var isNow = slot.id === currentId;
+      var isBreak = !slot.study && (
+        slot.task.indexOf('BREAK') >= 0 || slot.task.indexOf('LUNCH') >= 0 ||
+        slot.task.indexOf('REST') >= 0 || slot.task.indexOf('Dinner') >= 0 ||
+        slot.task.indexOf('SLEEP') >= 0 || slot.task.indexOf('BGMI') >= 0 ||
+        slot.task.indexOf('Relax') >= 0
+      );
+      var alarmOn = !!alarms[slot.id];
+
+      var div = document.createElement('div');
+      div.className = 'slot' + (isDone ? ' done' : '') + (isNow ? ' now' : '') + (isBreak ? ' is-break' : '');
+
+      var nowBadge = isNow ? '<span class="slot-now-badge">NOW</span>' : '';
+
+      div.innerHTML =
+        '<button class="slot-check" data-slot="' + slot.id + '">' + (isDone ? '✓' : '') + '</button>' +
+        '<div class="slot-info">' +
+          '<div class="slot-task">' + slot.task + '</div>' +
+          '<div class="slot-time">' + slot.time + ' ' + nowBadge + '</div>' +
+        '</div>' +
+        '<button class="slot-alarm ' + (alarmOn ? 'on' : '') + '" data-alarm="' + slot.id + '">' + (alarmOn ? '🔔' : '🔕') + '</button>';
+
+      container.appendChild(div);
+    }
+  }
+
+  container.onclick = function(e) {
+    var checkBtn = e.target.closest('[data-slot]');
+    var alarmBtn = e.target.closest('[data-alarm]');
+    if (checkBtn) {
+      toggleSlot(checkBtn.dataset.slot);
+    } else if (alarmBtn) {
+      toggleAlarm(alarmBtn.dataset.alarm);
+    }
+  };
+}
+
+function changeDate(dir) {
+  viewDate.setDate(viewDate.getDate() + dir);
+  renderSchedule();
+}
+
+function goToday() {
+  viewDate = new Date();
+  renderSchedule();
+}
+
+function toggleSlot(slotId) {
+  var dk = dateKey(viewDate);
+  var data = getDayData(dk);
+  if (!data.slots) data.slots = {};
+  data.slots[slotId] = !data.slots[slotId];
+  setDayData(dk, data);
+
+  if (data.slots[slotId]) {
+    completedTodayCount++;
+    var m = MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)];
+    if (completedTodayCount % 3 === 0) {
+      showMotivation(m.emoji, m.text, m.sub);
+    } else {
+      showToast(m.emoji + ' ' + m.text);
+    }
+  }
+
+  renderSchedule();
+  if (document.getElementById('pageHome').classList.contains('active')) renderHome();
+}
+
+function toggleAlarm(slotId) {
+  var dk = dateKey(viewDate);
+  var data = getDayData(dk);
+  if (!data.alarms) data.alarms = {};
+  data.alarms[slotId] = !data.alarms[slotId];
+  setDayData(dk, data);
+
+  if (data.alarms[slotId]) {
+    showToast('⏰ Alarm set! Notification 5 min before.');
+  } else {
+    showToast('🔕 Alarm removed.');
+  }
+
+  renderSchedule();
+}
+
+function toggleAllAlarms(on) {
+  var dk = dateKey(viewDate);
+  var data = getDayData(dk);
+  data.alarms = {};
+  if (on) {
+    for (var i = 0; i < ALL_SLOTS.length; i++) { data.alarms[ALL_SLOTS[i].id] = true; }
+    showToast('🔔 All alarms enabled!');
+  } else {
+    showToast('🔕 All alarms disabled.');
+  }
+  setDayData(dk, data);
+  renderSchedule();
+}
+
+// ====== NOTIFICATIONS ======
+function requestNotifPermission() {
+  if ('Notification' in window) {
+    Notification.requestPermission().then(function(p) {
+      if (p === 'granted') {
+        showToast('✅ Notifications enabled!');
+        document.getElementById('notifBanner').style.display = 'none';
+      } else {
+        showToast('❌ Notifications denied. Enable in browser settings.');
+      }
+    });
+  }
+}
+
+var notifiedSlots = {};
+
+function checkNotifications() {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  var dk = todayKey();
+  var data = getDayData(dk);
+  var alarms = data.alarms || {};
+  var now = new Date();
+  var nowMin = now.getHours() * 60 + now.getMinutes();
+
+  for (var i = 0; i < ALL_SLOTS.length; i++) {
+    var slot = ALL_SLOTS[i];
+    if (!alarms[slot.id]) continue;
+    var slotMin = slot.startH * 60 + slot.startM;
+    var diff = slotMin - nowMin;
+
+    var key5 = slot.id + '_5m_' + dk;
+    var key0 = slot.id + '_0m_' + dk;
+
+    if (diff === 5 && !notifiedSlots[key5]) {
+      notifiedSlots[key5] = true;
+      new Notification('⏰ Coming up in 5 min!', {
+        body: slot.task + ' (' + slot.time + ')',
+        tag: key5
+      });
+    }
+
+    if (diff === 0 && !notifiedSlots[key0]) {
+      notifiedSlots[key0] = true;
+      new Notification('🚀 Time to start!', {
+        body: slot.task + ' — NOW!',
+        tag: key0
+      });
+    }
+  }
+}
+
+// ====== CHECKLIST PAGE ======
+function renderChecklist() {
+  var dk = todayKey();
+  var data = getDayData(dk);
+  var checks = data.checks || {};
+  var container = document.getElementById('checklistItems');
+  container.innerHTML = '';
+
+  var doneCount = 0;
+  for (var i = 0; i < CHECKLIST_ITEMS.length; i++) {
+    var item = CHECKLIST_ITEMS[i];
+    var isDone = !!checks['c' + i];
+    if (isDone) doneCount++;
+    var div = document.createElement('div');
+    div.className = 'check-item' + (isDone ? ' done' : '');
+    div.setAttribute('data-check', i);
+    div.innerHTML =
+      '<div class="check-box">' + (isDone ? '✓' : '') + '</div>' +
+      '<div class="check-label">' + item.emoji + '  ' + item.text + '</div>';
+    container.appendChild(div);
+  }
+
+  container.onclick = function(e) {
+    var item = e.target.closest('[data-check]');
+    if (item) toggleCheck(parseInt(item.dataset.check));
+  };
+
+  var pct = Math.round(doneCount / CHECKLIST_ITEMS.length * 100);
+  document.getElementById('checkCount').textContent = doneCount + '/' + CHECKLIST_ITEMS.length;
+  document.getElementById('checklistPct').textContent = pct + '%';
+  document.getElementById('checklistPct').style.color = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--amber)' : 'var(--text2)';
+  document.getElementById('checklistBar').style.width = pct + '%';
+  document.getElementById('checklistBar').style.background = pct === 100 ? 'var(--green)' : pct > 50 ? 'var(--amber)' : 'var(--accent)';
+
+  document.getElementById('notesArea').value = data.notes || '';
+}
+
+function toggleCheck(idx) {
+  var dk = todayKey();
+  var data = getDayData(dk);
+  if (!data.checks) data.checks = {};
+  data.checks['c' + idx] = !data.checks['c' + idx];
+  setDayData(dk, data);
+
+  if (data.checks['c' + idx]) {
+    var m = MOTIVATIONS[Math.floor(Math.random() * MOTIVATIONS.length)];
+    showToast(m.emoji + ' ' + m.text);
+  }
+
+  renderChecklist();
+  if (document.getElementById('pageHome').classList.contains('active')) renderHome();
+}
+
+function saveNotes() {
+  var dk = todayKey();
+  var data = getDayData(dk);
+  data.notes = document.getElementById('notesArea').value;
+  setDayData(dk, data);
+}
+
+// ====== CALENDAR PAGE ======
+function renderCalendar() {
+  var months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  document.getElementById('calMonth').textContent = months[calMonth] + ' ' + calYear;
+
+  var grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  var dayNames = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  for (var d = 0; d < dayNames.length; d++) {
+    var div = document.createElement('div');
+    div.className = 'cal-day-name';
+    div.textContent = dayNames[d];
+    grid.appendChild(div);
+  }
+
+  var firstDay = new Date(calYear, calMonth, 1).getDay();
+  var daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  var today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  for (var i = 0; i < firstDay; i++) {
+    var div = document.createElement('div');
+    div.className = 'cal-day empty';
+    grid.appendChild(div);
+  }
+
+  var activeDays = 0, totalPct = 0, perfectDays = 0;
+
+  for (var d = 1; d <= daysInMonth; d++) {
+    var date = new Date(calYear, calMonth, d);
+    var dk = dateKey(date);
+    var pct = getOverallProgress(dk);
+    var isFuture = date > today;
+    var isT = isToday(date);
+    var isSel = calSelectedDate === dk;
+
+    var level = 'level-0';
+    if (!isFuture && pct > 0) {
+      activeDays++;
+      totalPct += pct;
+      if (pct >= 85) { level = 'level-4'; perfectDays++; }
+      else if (pct >= 60) level = 'level-3';
+      else if (pct >= 30) level = 'level-2';
+      else level = 'level-1';
+    }
+
+    var div = document.createElement('div');
+    div.className = 'cal-day ' + (isFuture ? 'future' : level) + (isT ? ' today' : '') + (isSel ? ' selected' : '');
+
+    if (!isFuture && pct > 0) {
+      div.innerHTML = d + '<div class="cal-dot"></div>';
+    } else {
+      div.textContent = d;
+    }
+
+    if (!isFuture) {
+      div.setAttribute('data-calday', dk);
+    }
+    grid.appendChild(div);
+  }
+
+  grid.onclick = function(e) {
+    var dayEl = e.target.closest('[data-calday]');
+    if (dayEl) {
+      calSelectedDate = dayEl.dataset.calday;
+      renderCalendar();
+    }
+  };
+
+  var avgPct = activeDays > 0 ? Math.round(totalPct / activeDays) : 0;
+  document.getElementById('calStats').innerHTML =
+    '<div class="stat-card"><div class="stat-value" style="color:var(--accent2);font-size:20px">' + activeDays + '</div><div class="stat-label">Active Days</div></div>' +
+    '<div class="stat-card"><div class="stat-value" style="color:var(--amber);font-size:20px">' + avgPct + '%</div><div class="stat-label">Avg Score</div></div>' +
+    '<div class="stat-card"><div class="stat-value" style="color:var(--green);font-size:20px">' + perfectDays + '</div><div class="stat-label">Perfect Days</div></div>';
+
+  if (calSelectedDate) {
+    renderCalDetail(calSelectedDate);
+  } else {
+    document.getElementById('calDetail').innerHTML = '<div style="text-align:center;color:var(--text2);font-size:13px;padding:24px">Tap a day to see details</div>';
+  }
+}
+
+function renderCalDetail(dk) {
+  var sp = getStudyProgress(dk);
+  var cp = getCheckProgress(dk);
+  var overall = getOverallProgress(dk);
+  var data = getDayData(dk);
+  var slots = data.slots || {};
+
+  var subjects = {
+    'Math': ['s1', 's2', 's10'],
+    'Physics': ['s4', 's5'],
+    'Chemistry': ['s7', 's8'],
+    'Revision': ['s17'],
+    'Formulas': ['s18']
+  };
+
+  var subjectBars = '';
+  for (var name in subjects) {
+    var ids = subjects[name];
+    var done = 0;
+    for (var i = 0; i < ids.length; i++) { if (slots[ids[i]]) done++; }
+    var pct = Math.round(done / ids.length * 100);
+    var color = pct === 100 ? 'var(--green)' : pct > 0 ? 'var(--amber)' : 'var(--red)';
+    subjectBars +=
+      '<div class="cal-bar">' +
+        '<div class="cal-bar-label">' + name + '</div>' +
+        '<div class="cal-bar-track"><div class="cal-bar-fill" style="width:' + pct + '%;background:' + color + '"></div></div>' +
+        '<div class="cal-bar-val">' + done + '/' + ids.length + '</div>' +
+      '</div>';
+  }
+
+  var dateParts = dk.split('-');
+  var dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
+
+  document.getElementById('calDetail').innerHTML =
+    '<div class="card cal-detail">' +
+      '<div class="cal-detail-header">' +
+        '<div>' +
+          '<div style="font-size:16px;font-weight:800">' + formatDateShort(dateObj) + '</div>' +
+          '<div style="font-size:12px;color:var(--text2);margin-top:3px">Overall: ' + overall + '%</div>' +
+        '</div>' +
+        '<button class="cal-detail-close" id="calDetailClose">✕</button>' +
+      '</div>' +
+      '<div style="display:flex;gap:16px;margin-bottom:16px">' +
+        '<div style="text-align:center;flex:1">' +
+          '<div style="font-size:22px;font-weight:800;color:var(--accent2)">' + sp.done + '/' + sp.total + '</div>' +
+          '<div style="font-size:11px;color:var(--text2)">Study Blocks</div>' +
+        '</div>' +
+        '<div style="text-align:center;flex:1">' +
+          '<div style="font-size:22px;font-weight:800;color:var(--green)">' + cp.done + '/' + cp.total + '</div>' +
+          '<div style="font-size:11px;color:var(--text2)">Checklist</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="font-size:11px;font-weight:700;color:var(--text2);margin-bottom:10px;letter-spacing:1px">SUBJECT BREAKDOWN</div>' +
+      subjectBars +
+      '<button id="viewDayBtn" data-dk="' + dk + '" style="width:100%;margin-top:14px;padding:12px;border-radius:12px;background:var(--accent);color:#fff;font-size:13px;font-weight:700;border:none;cursor:pointer">View Full Day →</button>' +
+    '</div>';
+
+  document.getElementById('calDetailClose').onclick = function() {
+    calSelectedDate = null;
+    renderCalendar();
+  };
+
+  document.getElementById('viewDayBtn').onclick = function() {
+    var dkVal = this.dataset.dk;
+    var parts = dkVal.split('-');
+    viewDate = new Date(parts[0], parts[1] - 1, parts[2]);
+    showPage('Schedule');
+  };
+}
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  calSelectedDate = null;
+  renderCalendar();
+}
+
+// ====== INIT ======
+function initApp() {
+  showPage('Home');
+  setInterval(checkNotifications, 30000);
+  checkNotifications();
+  setInterval(function() {
+    if (document.getElementById('pageSchedule').classList.contains('active')) renderSchedule();
+    if (document.getElementById('pageHome').classList.contains('active')) renderHome();
+  }, 60000);
+}
+
+// ====== STARTUP ======
+window.onload = function() {
+  initLogin();
+  if (localStorage.getItem('jeecup_logged') === 'true') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initApp();
+  }
+};
+</script>
+</body>
+</html>
